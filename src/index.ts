@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Transform, TransformCallback } from 'stream';
-import * as url from 'url';
+import { Transform, TransformCallback } from "stream";
+import * as url from "url";
 
 /**
  * Options for the basic auth
@@ -81,7 +81,7 @@ interface TransportOptions {
   silentError?: boolean;
 }
 
-class OpenobserveTransport extends Transform {
+export class OpenobserveTransport extends Transform {
   private options: TransportOptions;
   private logs: string[];
   private timer: NodeJS.Timeout | null;
@@ -100,15 +100,21 @@ class OpenobserveTransport extends Transform {
 
     this.options = { ...defaultOptions, ...options } as TransportOptions;
 
-    if (!this.options.url || !this.options.organization || !this.options.streamName) {
-      throw new Error('OpenObserve Pino: Missing required options: url, organization, or streamName');
+    if (
+      !this.options.url ||
+      !this.options.organization ||
+      !this.options.streamName
+    ) {
+      throw new Error(
+        "OpenObserve Pino: Missing required options: url, organization, or streamName"
+      );
     }
 
     this.logs = [];
     this.timer = null;
     this.apiCallInProgress = false;
 
-    process.on('beforeExit', () => {
+    process.on("beforeExit", () => {
       if (this.logs.length > 0 && !this.apiCallInProgress) {
         this.sendLogs();
       }
@@ -120,11 +126,19 @@ class OpenobserveTransport extends Transform {
   private createApiUrl(): string {
     const { url: baseUrl, organization, streamName } = this.options;
     const parsedUrl = url.parse(baseUrl);
-    const path = parsedUrl.pathname ? (parsedUrl.pathname.endsWith('/') ? parsedUrl.pathname.slice(0, -1) : parsedUrl.pathname) : '';
+    const path = parsedUrl.pathname
+      ? parsedUrl.pathname.endsWith("/")
+        ? parsedUrl.pathname.slice(0, -1)
+        : parsedUrl.pathname
+      : "";
     return `${parsedUrl.protocol}//${parsedUrl.host}${path}/api/${organization}/${streamName}/_multi`;
   }
 
-  _transform(log: any, encoding: BufferEncoding, callback: TransformCallback): void {
+  _transform(
+    log: any,
+    encoding: BufferEncoding,
+    callback: TransformCallback
+  ): void {
     this.logs.push(log);
     this.scheduleSendLogs();
     callback();
@@ -149,29 +163,34 @@ class OpenobserveTransport extends Transform {
     }
 
     const { auth, silentSuccess, silentError } = this.options;
-    const bulkLogs = this.logs.splice(0, this.options.batchSize!).join('');
+    const bulkLogs = this.logs.splice(0, this.options.batchSize!).join("");
 
     this.apiCallInProgress = true;
 
     try {
       const response = await fetch(this.apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Basic ${Buffer.from(`${auth.username}:${auth.password}`).toString('base64')}`,
-          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(
+            `${auth.username}:${auth.password}`
+          ).toString("base64")}`,
+          "Content-Type": "application/json",
         },
         body: bulkLogs,
       });
 
       if (response.ok) {
-        if (!silentSuccess) console.log('successful: ', await response.json());
+        if (!silentSuccess) console.log("successful: ", await response.json());
       } else {
-        if (!silentError) console.error('Failed to send logs:', response.status, response.statusText);
+        if (!silentError)
+          console.error(
+            "Failed to send logs:",
+            response.status,
+            response.statusText
+          );
       }
-
-
     } catch (error) {
-      if (!silentError) console.error('Failed to send logs:', error);
+      if (!silentError) console.error("Failed to send logs:", error);
     } finally {
       this.apiCallInProgress = false;
       this.scheduleSendLogs();
@@ -179,4 +198,4 @@ class OpenobserveTransport extends Transform {
   }
 }
 
-export default OpenobserveTransport;
+export default (opts: TransportOptions) => new OpenobserveTransport(opts);
