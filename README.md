@@ -39,6 +39,10 @@ The transport accepts an options object with the following properties:
 
 ## Usage
 
+You can use the transport by importing it directly, or by passing the package name as the target.
+
+### Direct import
+
 The way you import the `pino` and `@openobserve/pino-openobserve` packages depends on whether you're using `import` or `require`. 
 
 Using `import`:
@@ -78,7 +82,35 @@ logger.info('Hello, world!');
 logger.info({ lang: 'js', code: 'Node.js' }, 'Logging with JSON');
 ```
 
-In this example, the second `logger.info` call logs a JSON object containing the properties `lang` and `code`, along with the message 'Logging with JSON'. This is a common way to include structured data in your logs when using Pino.
+### Using package name
+```javascript
+// using require
+const pino = require('pino');
+
+// using import
+import pino from 'pino';
+
+const logger = pino({
+  level: 'info',
+  transport: {
+    target: '@openobserve/pino-openobserve',
+    options: {
+      url: 'https://your-openobserve-server.com',
+      organization: 'your-organization',
+      streamName: 'your-stream',
+      auth: {
+        username: 'your-username',
+        password: 'your-password',
+      },
+    },
+  },
+});
+
+logger.info('Hello, world!');
+logger.info({ lang: 'js', code: 'Node.js' }, 'Logging with JSON');
+```
+
+In the above examples, the second `logger.info` call logs a JSON object containing the properties `lang` and `code`, along with the message 'Logging with JSON'. This is a common way to include structured data in your logs when using Pino.
 
 ## License
 
