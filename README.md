@@ -39,33 +39,20 @@ The transport accepts an options object with the following properties:
 
 ## Usage
 
-You can use the transport by importing it directly, or by passing the package name as the target.
+You can use the transport by passing the package name as target, or by importing it directly.
 
-### Direct import
-
-The way you import the `pino` and `@openobserve/pino-openobserve` packages depends on whether you're using `import` or `require`. 
-
-Using `import`:
-
+### Using package name (Recommended)
 ```javascript
-import pino from 'pino';
-import OpenobserveTransport from '@openobserve/pino-openobserve';
-```
-
-Using `require`:
-
-```javascript
+// using require
 const pino = require('pino');
-const OpenobserveTransport = require('@openobserve/pino-openobserve');
-```
 
-After importing the necessary packages, you can use this transport with Pino like this:
+// using import
+import pino from 'pino';
 
-```javascript
 const logger = pino({
   level: 'info',
   transport: {
-    target: OpenobserveTransport,
+    target: '@openobserve/pino-openobserve',
     options: {
       url: 'https://your-openobserve-server.com',
       organization: 'your-organization',
@@ -82,18 +69,23 @@ logger.info('Hello, world!');
 logger.info({ lang: 'js', code: 'Node.js' }, 'Logging with JSON');
 ```
 
-### Using package name
+### Direct import
+
+The way you import the `pino` and `@openobserve/pino-openobserve` packages depends on whether you're using `import` or `require`. 
+
 ```javascript
 // using require
 const pino = require('pino');
+const OpenobserveTransport = require('@openobserve/pino-openobserve').OpenobserveTransport;
 
 // using import
 import pino from 'pino';
+import { OpenobserveTransport } from '@openobserve/pino-openobserve';
 
 const logger = pino({
   level: 'info',
   transport: {
-    target: '@openobserve/pino-openobserve',
+    target: OpenobserveTransport,
     options: {
       url: 'https://your-openobserve-server.com',
       organization: 'your-organization',
