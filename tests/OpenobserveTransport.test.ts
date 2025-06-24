@@ -1,4 +1,4 @@
-import OpenobserveTransport from "../src/index";
+import { OpenobserveTransport } from "../src/index";
 
 describe("OpenobserveTransport", () => {
   /**
@@ -49,7 +49,9 @@ describe("OpenobserveTransport", () => {
     // Attempt to instantiate OpenobserveTransport with missing options
     expect(() => {
       new OpenobserveTransport({} as any); // This should cause an error due to missing required fields
-    }).toThrow("OpenObserve Pino: Missing required options: url, organization, or streamName");
+    }).toThrow(
+      "OpenObserve Pino: Missing required options: url, organization, or streamName"
+    );
   });
 
   /**
@@ -63,7 +65,9 @@ describe("OpenobserveTransport", () => {
 
     expect(() => {
       new OpenobserveTransport(incompleteOptions); // Instantiate the class
-    }).toThrow("OpenObserve Pino: Missing required options: url, organization, or streamName");
+    }).toThrow(
+      "OpenObserve Pino: Missing required options: url, organization, or streamName"
+    );
   });
 
   /**
@@ -78,7 +82,9 @@ describe("OpenobserveTransport", () => {
     // Attempt to instantiate OpenobserveTransport with missing 'streamName' option
     expect(() => {
       new OpenobserveTransport(incompleteOptions); // Instantiate the class
-    }).toThrow("OpenObserve Pino: Missing required options: url, organization, or streamName");
+    }).toThrow(
+      "OpenObserve Pino: Missing required options: url, organization, or streamName"
+    );
   });
 
   /**
@@ -104,7 +110,10 @@ describe("OpenobserveTransport", () => {
    */
   it("should correctly create API URL", () => {
     // Spy on the private 'createApiUrl' method to check if it was called
-    const spyCreateApiUrl = jest.spyOn(OpenobserveTransport.prototype as any, "createApiUrl");
+    const spyCreateApiUrl = jest.spyOn(
+      OpenobserveTransport.prototype as any,
+      "createApiUrl"
+    );
 
     // Instantiate the class
     transport = new OpenobserveTransport(validOptions);
@@ -136,7 +145,10 @@ describe("OpenobserveTransport", () => {
     );
 
     // Spy on the 'scheduleSendLogs' method to check if it was called
-    const scheduleSendLogsSpy = jest.spyOn(transport as any, "scheduleSendLogs");
+    const scheduleSendLogsSpy = jest.spyOn(
+      transport as any,
+      "scheduleSendLogs"
+    );
 
     // Mock the callback passed to _transform
     const callback = jest.fn();
@@ -275,7 +287,9 @@ describe("OpenobserveTransport", () => {
     );
 
     // Verify that the console.log function was called with a success message
-    expect(console.log).toHaveBeenCalledWith("successful: ", { statusText: "ok" });
+    expect(console.log).toHaveBeenCalledWith("successful: ", {
+      statusText: "ok",
+    });
   });
 
   /**
@@ -315,7 +329,10 @@ describe("OpenobserveTransport", () => {
     await transport["sendLogs"]();
 
     // Verify that the console.error function was called with an error message
-    expect(console.error).toHaveBeenCalledWith("Failed to send logs:", expect.any(Error));
+    expect(console.error).toHaveBeenCalledWith(
+      "Failed to send logs:",
+      expect.any(Error)
+    );
   });
 
   /**
